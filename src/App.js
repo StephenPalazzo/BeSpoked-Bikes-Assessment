@@ -23,6 +23,8 @@ function App() {
     sales_date: '',
   });
 
+  const [quarter, setQuarter] = useState('');
+
   
   async function fetchData(endpoint) {
     try {
@@ -40,7 +42,7 @@ function App() {
     const productsData = await fetchData('products');
     const customersData = await fetchData('customers');
     const salesData = await fetchData(`sales?start_date=${startDate}&end_date=${endDate}`);
-    const quarterlyCommissionData = await fetchData('quarterly-commissions');
+    const quarterlyCommissionData = await fetchData(`quarterly-commissions?quarter=${quarter}`);
 
     if (customersData) setCustomers(customersData.customers);
     if (productsData) setProducts(productsData.products);
@@ -51,7 +53,7 @@ function App() {
 
   useEffect(() => {
     fetchEntities();
-  }, [])
+  }, [quarter, startDate, endDate])
 
 
   const handleDataUpdates = async () => {
@@ -93,7 +95,6 @@ function App() {
           sales_date: '',
         });
         fetchEntities();
-        console.log('Sale created successfully');
       } else {
         console.error('Failed to create sale');
       }
@@ -426,7 +427,7 @@ function App() {
 
       <div className="row mt-5">
         <div className="col">
-          <h2 className="mb-1">Sales</h2>
+          <h2>Sales</h2>
           <div className="row mb-3">
             <div className="col-md-3">
               <input
@@ -447,10 +448,6 @@ function App() {
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
-
-            <div className="col-md-2 d-flex align-items-end">
-              <button className="btn btn-primary" onClick={fetchEntities}>Search</button>
-            </div>
           </div>
 
           <ul className="list-group">
@@ -469,17 +466,31 @@ function App() {
 
 
         <div className="col">
-          <h2 className="pb-5">Quarterly Salesperson Commission Report</h2>
+          <h2>Quarterly Salesperson Commission Report</h2>
+          <div className="btn-group mb-3" role="group" aria-label="Quarterly Selection">
+            <input type="radio" className="btn-check" name="quarter" id="q1" autoComplete="off" onClick={() => setQuarter('Q1')} />
+            <label className="btn btn-outline-primary" htmlFor="q1">Q1</label>
+
+            <input type="radio" className="btn-check" name="quarter" id="q2" autoComplete="off" onClick={() => setQuarter('Q2')} />
+            <label className="btn btn-outline-primary" htmlFor="q2">Q2</label>
+
+            <input type="radio" className="btn-check" name="quarter" id="q3" autoComplete="off" onClick={() => setQuarter('Q3')} />
+            <label className="btn btn-outline-primary" htmlFor="q3">Q3</label>
+
+            <input type="radio" className="btn-check" name="quarter" id="q4" autoComplete="off" onClick={() => setQuarter('Q4')} />
+            <label className="btn btn-outline-primary" htmlFor="q4">Q4</label>
+          </div>
           <ul className="list-group">
             {Object.entries(quarterlyCommission).map(([salespersonId, commissionInfo]) => (
               <li key={salespersonId} className="list-group-item">
-                <h5 className="mb-1">Salesperson: {commissionInfo.salesperson}</h5>
+                <h5 className="mb-1">{commissionInfo.salesperson}</h5>
                 <p className="mb-1">Total Sales: ${commissionInfo.total_sales}</p>
                 <p className="mb-1">Total Commission: ${commissionInfo.total_commission}</p>
               </li>
             ))}
           </ul>
         </div>
+
       </div>
 
     </div>
